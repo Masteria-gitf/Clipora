@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Cadence découpe intelligemment une longue vidéo en clips verticaux prêts pour TikTok, rapidement et entièrement dans votre navigateur.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%233a3cff%27/%3E%3Cpath d=%27M18 20h8v24h-8zM30 28h8v16h-8zM42 14h8v30h-8z%27 fill=%27%23ffd93d%27/%3E%3C/svg%3E">
+<title>Cadence – Une longue vidéo, des clips prêts pour TikTok</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&display=swap">
+<style>
+:root{--bg:#e8edf3;--ink:#13213f;--mut:#56627f;--line:#c4cedd;--card:#f6f8fb;--ac:#3a3cff;--err:#c62828;--r:14px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1730;--ink:#e8edf8;--mut:#9aa6c4;--line:#2a3558;--card:#18224a;--ac:#5f62ff;--err:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header,main,.item{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-bottom:8px}
+.item label{display:grid;gap:2px;font-size:13px;color:var(--mut)}
+.item label.chk{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:16px}
+.item input[type=number]{width:96px;font:inherit;padding:6px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+.item canvas{width:96px;height:54px;border-radius:8px;background:#000}
+.item .why{flex-basis:100%;font-size:13px;font-weight:600;color:var(--ac)}
+.item .snip{flex-basis:100%;font-size:14px;font-style:italic;color:var(--mut)}
+.item .len{flex:1;min-width:150px;color:var(--mut);font-size:14px;padding-bottom:6px}
+#rev .row{margin-top:12px}
+input[type=file]{font:inherit;font-size:14px;color:var(--mut)}
+footer{max-width:1080px;margin:0 auto;padding:0 20px}
+header{padding-top:28px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px}
+.logo{font:800 34px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.03em}
+header p{margin:0;color:var(--mut);max-width:62ch}
+h2{font:800 22px/1.2 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 4px;word-break:break-word}
+section{margin:22px 0}
+.drop{border:2px dashed var(--ac);border-radius:var(--r);padding:64px 24px;text-align:center;background:var(--card);cursor:pointer}
+.drop.over{background:color-mix(in srgb,var(--ac) 14%,var(--card))}
+.drop .big{font:800 clamp(26px,5vw,44px)/1.1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 10px}
+.drop p{margin:0 0 14px;color:var(--mut)}
+button,.btn{font:inherit;font-weight:600;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:9px 18px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-block}
+button:hover:not(:disabled),.btn:hover{background:var(--ink);color:var(--bg)}
+.primary{background:var(--ac);border-color:var(--ac);color:#fff}
+.primary:hover:not(:disabled){background:var(--ink);border-color:var(--ink)}
+button:disabled,select:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.pv{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.pv video{width:min(100%,360px);max-height:220px;border-radius:var(--r);background:#000}
+.pv p{margin:0 0 10px;color:var(--mut)}
+#wave{width:100%;height:140px;display:block;background:var(--card);border-radius:var(--r);margin:16px 0;cursor:pointer}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;border:0;padding:0;margin:0 0 16px}
+.opts label{display:grid;gap:4px;font-size:14px;color:var(--mut)}
+.opts label.chk{display:flex;align-items:center;gap:8px;align-self:end;padding-bottom:8px}
+select,textarea,input[type=text],input[type=number]{font:inherit;padding:8px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#steps{list-style:none;display:flex;flex-wrap:wrap;gap:8px 20px;padding:0;margin:18px 0 8px;color:var(--mut)}
+#steps li::before{content:"○ "}
+#steps li.done::before{content:"● ";color:var(--ac)}
+#steps li.now{color:var(--ink);font-weight:700}
+#steps li.now::before{content:"◉ ";color:var(--ac)}
+progress{width:100%;height:8px;accent-color:var(--ac)}
+#msg{min-height:1.5em;margin:8px 0}
+.err{color:var(--err);font-weight:600}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+article{background:var(--card);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--line)}
+article video{width:100%;aspect-ratio:9/16;background:#000;object-fit:contain}
+.meta{padding:12px;display:grid;gap:8px}
+.meta label{display:grid;gap:4px;font-size:14px;color:var(--mut)}
+textarea,input[type=text]{width:100%;font-weight:600;resize:vertical;background:var(--bg)}
+.tags,.mt{margin:0;font-size:14px;color:var(--mut);word-break:break-word}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.btns>*{font-size:14px;padding:6px 12px}
+footer{margin:40px auto;color:var(--mut);font-size:14px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">Cadence</span>
+  <p>Déposez une longue vidéo où l’on parle : Cadence repère intelligemment les meilleurs passages (énergie + contenu), les coupe proprement, ajoute sous-titres et titres, et vous rend des clips verticaux prêts pour TikTok — tout localement et le plus rapidement possible.</p>
+</header>
+<main>
+  <section id="drop" class="drop" tabindex="0" role="button" aria-label="Choisir une vidéo">
+    <p class="big">Déposez votre vidéo ici</p>
+    <p>MP4, MOV ou WebM, 1 Go maximum. Rien n’est envoyé sur Internet : tout se passe dans votre navigateur.</p>
+    <button id="pick" class="primary" type="button">Choisir un fichier</button>
+    <p id="derr" class="err" role="alert"></p>
+    <input id="file" type="file" accept="video/*" hidden>
+  </section>
+
+  <section id="work" hidden>
+    <div class="pv">
+      <video id="pv" controls playsinline></video>
+      <div><h2 id="fname"></h2><p id="finfo"></p><button id="change" type="button">Changer de vidéo</button></div>
+    </div>
+    <canvas id="wave" aria-label="Forme d’onde de la vidéo avec les passages retenus en jaune"></canvas>
+    <fieldset class="opts">
+      <label>Répartition<select id="mode"><option value="smart" selected>Intelligent : les plus intéressants, bien répartis</option><option value="spread">Répartis sur toute la vidéo</option><option value="best">Les passages les plus forts</option></select></label>
+      <label>Nombre de clips (1 à 20)<input type="number" id="n" min="1" max="20" value="5"></label>
+      <label>Durée des clips<select id="len"><option value="15-30">15 à 30 s</option><option value="20-45">20 à 45 s</option><option value="30-60" selected>30 à 60 s</option><option value="45-90">45 à 90 s</option></select></label>
+      <label>Cadrage<select id="fit"><option value="blur">Vidéo entière sur fond flou</option><option value="cover">Plein écran recadré</option></select></label>
+      <label>Style des sous-titres<select id="sty"><option value="pop">Blanc, mot actif jaune</option><option value="green">Blanc, mot actif vert</option><option value="white">Blanc uniforme</option></select></label>
+      <label>Titre commun (facultatif)<input type="text" id="ttl" maxlength="90" placeholder="Affiché 3 secondes en haut"></label>
+      <label>Qualité<select id="qual"><option value="540">540 × 960 (léger)</option><option value="720" selected>720 × 1280</option><option value="1080">1080 × 1920</option></select></label>
+      <label class="chk"><input type="checkbox" id="hook" checked>Afficher le titre 3 secondes</label>
+      <label class="chk"><input type="checkbox" id="ser" checked>Numéroter les parties</label>
+      <label class="chk"><input type="checkbox" id="rv" checked>Valider les passages avant le montage</label>
+      <label class="chk"><input type="checkbox" id="nm" checked>Égaliser la voix</label>
+      <label class="chk"><input type="checkbox" id="tx">Comprendre le contenu (transcription, plus lent)</label>
+      <label class="chk"><input type="checkbox" id="cap" checked>Incruster les sous-titres</label>
+      <label>Langue parlée<select id="lang"><option value="">Détection automatique</option><option value="french">Français</option><option value="english">Anglais</option><option value="spanish">Espagnol</option><option value="portuguese">Portugais</option><option value="german">Allemand</option><option value="italian">Italien</option><option value="arabic">Arabe</option></select></label>
+      <label>Précision de la transcription<select id="model"><option value="Xenova/whisper-tiny" selected>Rapide</option><option value="Xenova/whisper-base">Équilibrée</option><option value="Xenova/whisper-small">Précise (lente)</option></select></label>
+      <label>Sous-titres (.srt ou .vtt, facultatif)<input type="file" id="sub" accept=".srt,.vtt,text/vtt,text/plain"><span id="subinfo" class="mt"></span></label>
+    </fieldset>
+    <div class="row">
+      <button id="go" class="primary" type="button">Créer les clips</button>
+      <button id="stop" type="button" hidden>Annuler</button>
+    </div>
+    <ol id="steps"><li>Lire l’audio</li><li>Choisir les passages</li><li>Monter</li></ol>
+    <progress id="bar" max="1" hidden></progress>
+    <p id="msg" role="status"></p>
+  </section>
+
+  <section id="rev" hidden>
+    <h2>Passages proposés</h2>
+    <p class="mt">Cochez, ajustez le début et la fin, écoutez dans le lecteur ci-dessus, puis lancez le montage.</p>
+    <div id="revlist"></div>
+    <div class="row"><button id="addp" type="button">Ajouter un passage à la position du lecteur</button><button id="more" type="button">Proposer d’autres passages</button><button id="mont" class="primary" type="button">Monter les clips cochés</button></div>
+  </section>
+
+  <section id="out" hidden>
+    <div class="bar"><h2>Vos clips</h2><button id="dlall" type="button">Tout télécharger (.zip)</button></div>
+    <div id="grid"></div>
+  </section>
+</main>
+<footer>
+  <p>Cadence n’envoie jamais votre vidéo sur un serveur : tout est traité dans votre navigateur. Utilisez Chrome, Edge ou Safari récent sur ordinateur et gardez l’onglet visible pendant le montage. Le montage se fait en temps réel. Pour plus de vitesse, désactivez la transcription et choisissez la qualité 540 ou 720.</p>
+</footer>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s),MAXB=1024**3,SR=16000;
+const MIMES=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1.4D401F,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','video/mp4'];
+const FONT='"Bricolage Grotesque",system-ui,sans-serif';
+const STY={pop:['#ffd93d','#fff'],green:['#39ff88','#fff'],white:['#fff','#fff']};
+const SETS=['tx','lang','model','cap','mode','n','len','fit','qual','sty','hook','ser','rv','nm'];
+let mp4=null,pcmKeep=null,cuesAuto=false,asrW=null,asrKey='',asrId=0;
+let file=null,url=null,dur=0,busy=false,abort=false,clips=[],wl=null,lastE=null,props=[],cues=[],seq=0,stopAt=0;
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const fmt=s=>{s=Math.max(0,s|0);return(s/60|0)+':'+String(s%60).padStart(2,'0')};
+const clampN=()=>{const n=Math.max(1,Math.min(20,parseInt($('#n').value,10)||5));$('#n').value=n;return n};
+const slug=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+const eta=s=>s>=90?Math.round(s/60)+' min':Math.max(5,Math.round(s/5)*5)+' s';
+const say=(t,err)=>{const m=$('#msg');m.textContent=t;m.className=err?'err':''};
+const derr=t=>{$('#derr').textContent=t};
+const step=i=>document.querySelectorAll('#steps li').forEach((li,k)=>li.className=k<i?'done':k===i?'now':'');
+const prog=v=>{const b=$('#bar');if(v===undefined){b.hidden=true;return}b.hidden=false;if(v===null)b.removeAttribute('value');else b.value=Math.min(1,Math.max(0,v))};
+const chk=()=>{if(abort)throw new Error('Annulé')};
+const once=(el,ev)=>new Promise((res,rej)=>{
+  const ok=()=>{el.removeEventListener('error',bad);res()},bad=()=>{el.removeEventListener(ev,ok);rej(new Error('Lecture de la vidéo impossible.'))};
+  el.addEventListener(ev,ok,{once:true});el.addEventListener('error',bad,{once:true});
+});
+const seek=async(v,t)=>{if(Math.abs(v.currentTime-t)<.02)return;v.currentTime=t;await once(v,'seeked')};
+async function open(){const v=document.createElement('video');v.playsInline=true;v.preload='auto';v.src=url;await once(v,'loadedmetadata');return v}
+function lock(on){document.querySelectorAll('#work select,#work input,#go,#change').forEach(e=>e.disabled=on);$('#stop').hidden=!on}
+function save(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+async function keepAwake(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request('screen');else if(wl){await wl.release();wl=null}}catch(e){}}
+function loadSet(){try{const o=JSON.parse(localStorage.getItem('cadence')||'{}');SETS.forEach(k=>{const el=$('#'+k);if(el&&k in o){if(el.type==='checkbox')el.checked=!!o[k];else el.value=o[k]}})}catch(e){}}
+function autoLite(){if(!localStorage.getItem('cadence')&&(/Mobi|Android/.test(navigator.userAgent)||(navigator.deviceMemory&&navigator.deviceMemory<=4))){$('#qual').value='540';$('#tx').checked=false}}
+function saveSet(){try{const o={};SETS.forEach(k=>{const el=$('#'+k);o[k]=el.type==='checkbox'?el.checked:el.value});localStorage.setItem('cadence',JSON.stringify(o))}catch(e){}}
+
+/* ---------- Chargement ---------- */
+function clearResults(){
+  clips.forEach(c=>URL.revokeObjectURL(c.u));clips=[];$('#grid').innerHTML='';$('#out').hidden=true;$('#rev').hidden=true;props=[];lastE=null;
+  const w=$('#wave');w.getContext('2d').clearRect(0,0,w.width,w.height);say('');step(-1);prog(undefined);
+}
+async function load(f){
+  derr('');
+  if(!f||busy)return;
+  if(f.size>MAXB)return derr('Ce fichier fait '+(f.size/1024**3).toFixed(2)+' Go. La limite est de 1 Go.');
+  if(f.type&&!f.type.startsWith('video/'))return derr('Ce fichier n’est pas une vidéo.');
+  const u=URL.createObjectURL(f),v=$('#pv');
+  v.src=u;
+  try{await once(v,'loadedmetadata')}catch(e){URL.revokeObjectURL(u);return derr('Ce format n’est pas lisible par votre navigateur. Convertissez la vidéo en MP4 (H.264) puis réessayez.')}
+  if(!isFinite(v.duration)||v.duration<20){URL.revokeObjectURL(u);return derr('La vidéo doit durer au moins 20 secondes.')}
+  clearResults();if(url)URL.revokeObjectURL(url);
+  file=f;url=u;dur=v.duration;cues=[];cuesAuto=false;$('#sub').value='';$('#subinfo').textContent='';
+  $('#fname').textContent=f.name;
+  $('#finfo').textContent=fmt(dur)+' · '+v.videoWidth+'×'+v.videoHeight+' · '+(f.size/1048576).toFixed(0)+' Mo';
+  $('#drop').hidden=true;$('#work').hidden=false;
+}
+
+/* ---------- Sous-titres importés (.srt / .vtt) ---------- */
+function parseSub(t){
+  const out=[],blocks=t.replace(/\r/g,'').replace(/^\uFEFF/,'').replace(/^WEBVTT[^\n]*\n/,'').split(/\n\s*\n/);
+  const tm=s=>{const m=s.trim().match(/(?:(\d+):)?(\d+):(\d+)[.,](\d+)/);return m?Number(m[1]||0)*3600+Number(m[2])*60+Number(m[3])+Number('0.'+m[4]):NaN};
+  for(const b of blocks){
+    const L=b.split('\n'),i=L.findIndex(l=>l.includes('-->'));if(i<0)continue;
+    const p=L[i].split('-->'),a=tm(p[0]),e=tm(p[1].split(/\s/).filter(Boolean)[0]||'');
+    const text=L.slice(i+1).join(' ').replace(/<[^>]+>/g,'').replace(/\{[^}]+\}/g,'').replace(/\s+/g,' ').trim();
+    if(text&&isFinite(a)&&isFinite(e)&&e>a)out.push({a,b:e,text});
+  }
+  return out.sort((x,y)=>x.a-y.a);
+}
+async function loadSub(f){
+  const info=$('#subinfo');
+  if(!f){cues=[];cuesAuto=false;info.textContent='';return}
+  try{
+    cues=parseSub(await f.text());cuesAuto=false;
+    info.textContent=cues.length?cues.length+' lignes de sous-titres chargées.':'Aucune ligne reconnue dans ce fichier.';
+    if(!cues.length)$('#sub').value='';
+  }catch(e){cues=[];info.textContent='Fichier illisible.'}
+}
+function cuesFor(x){return cues.filter(q=>q.b>x.s&&q.a<x.e).map(q=>({a:Math.max(0,q.a-x.s),b:Math.min(x.e-x.s,q.b-x.s),text:q.text}))}
+function snap(x,hi){
+  if(!cues.length)return x;
+  let s=x.s,e=x.e;
+  const END=/[.!?…]["»”)]*$/,f=cues.findIndex(q=>q.b>s);
+  if(f>=0){
+    let ok=false;
+    for(let i=f;i<Math.min(cues.length,f+4);i++){
+      const q=cues[i],pv=cues[i-1];if(q.a>s+4)break;
+      if(q.a>=s-4&&(!pv||END.test(pv.text))){s=Math.max(0,q.a-.15);ok=true;break}
+    }
+    if(!ok&&cues[f].a>=s-2.5&&cues[f].a<=s+3)s=Math.max(0,cues[f].a-.15);
+  }
+  let li=-1;for(let i=0;i<cues.length;i++){if(cues[i].a<e)li=i;else break}
+  if(li>=0){
+    let k=-1;
+    for(let i=li;i>=Math.max(0,li-4);i--){const q=cues[i];if(q.b<e-6)break;if(END.test(q.text)&&q.b<=e+4){k=i;break}}
+    if(k<0&&cues[li].b>=e-3&&cues[li].b<=e+3)k=li;
+    if(k>=0)e=Math.min(dur,cues[k].b+.3);
+  }
+  return e-s>hi+4||e-s<8?x:{...x,s,e};
+}
+function srtOf(cs){
+  const t=s=>{const ms=Math.round(s*1000),p=(n,l)=>String(n).padStart(l,'0');return p(ms/3600000|0,2)+':'+p(ms/60000%60|0,2)+':'+p(ms/1000%60|0,2)+','+p(ms%1000,3)};
+  return cs.map((q,i)=>(i+1)+'\n'+t(q.a)+' --> '+t(q.b)+'\n'+q.text+'\n').join('\n');
+}
+function chunkCues(cs){
+  const out=[];
+  for(const q of cs){
+    const ws=q.text.split(' ').filter(Boolean),parts=[];let cur=[],len=0;
+    for(const w of ws){if(cur.length&&(cur.length>=7||len+w.length>38)){parts.push(cur);cur=[];len=0}cur.push(w);len+=w.length+1}
+    if(cur.length)parts.push(cur);
+    const tot=ws.join('').length||1;let t=q.a;
+    for(const p of parts){
+      const pc=p.join('').length||1,span=(q.b-q.a)*pc/tot;let tt=t;
+      const wx=p.map(w=>{const d=span*w.length/pc,o={w,a:tt,b:tt+d};tt+=d;return o});
+      out.push({a:t,b:t+span,ws:wx});t+=span;
+    }
+  }
+  return out;
+}
+
+/* ---------- Titres automatiques (à partir des sous-titres importés) ---------- */
+const SW=new Set('le la les un une des de du et en au aux ce cet cette ces je tu il elle on nous vous ils elles me te se mon ton son ma ta sa mes tes ses qui que quoi dont ne pas plus pour par sur sous avec sans dans est sont suis es été être avoir ont avons avez ça mais ou donc car si comme très aussi alors bien tout tous fait faire peut cela celui celle quand même entre vers chez the and but for with are was were been this that these those you your have has had does did can will would there what which who how when where why they their from not just then than into about'.split(' '));
+function mkTitle(text){
+  const sents=text.match(/[^.!?…]+[.!?…]*/g)||[text],freq={},W=/[\p{L}]+(?:[’'][\p{L}]+)*/gu,low=text.toLowerCase().replace(/\b(?:l|d|j|m|t|s|c|n|qu)[’']/g,'');
+  (low.match(W)||[]).filter(w=>w.length>=4).forEach(w=>{if(!SW.has(w))freq[w]=(freq[w]||0)+1});
+  const kw=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]);
+  let best='',bs=-1e9;
+  sents.forEach((s,i)=>{
+    s=s.trim();const wc=s.split(/\s+/).length;if(wc<4)return;
+    let sc=(/\?/.test(s)?3:0)+(/\d/.test(s)?1.5:0)+(wc>=6&&wc<=14?2:wc<=20?1:0)-i*.3;
+    (s.toLowerCase().replace(/\b(?:l|d|j|m|t|s|c|n|qu)[’']/g,'').match(W)||[]).forEach(w=>sc+=(freq[w]||0)*.3);
+    if(sc>bs){bs=sc;best=s}
+  });
+  let t=(best||sents[0]).replace(/^(et|mais|donc|alors|and|but|so|ben|bah|euh)\s+/i,'').trim().replace(/[.,;:…]+$/,'');
+  if(t.length>72)t=t.slice(0,72).replace(/\s+\S*$/,'')+'…';
+  t=t.charAt(0).toUpperCase()+t.slice(1);
+  return{title:t,tags:kw.map(k=>'#'+k.replace(/[’']/g,'')).concat(['#fyp','#pourtoi'])};
+}
+
+/* ---------- Analyse audio ---------- */
+async function energyFast(){
+  const buf=await file.arrayBuffer(),ac=new OfflineAudioContext(1,SR,SR),ab=await ac.decodeAudioData(buf);
+  if(ab.sampleRate!==SR)throw new Error('rate');
+  const n=Math.floor(ab.length/1600),ch=ab.numberOfChannels,d=[],e=new Float32Array(n),keep=new Int16Array(ab.length);
+  for(let c=0;c<ch;c++)d.push(ab.getChannelData(c));
+  let t=performance.now();
+  for(let i=0;i<n;i++){
+    let s=0;
+    for(let j=i*1600;j<i*1600+1600;j++){let x=0;for(let c=0;c<ch;c++)x+=d[c][j];x/=ch;s+=x*x;keep[j]=Math.max(-1,Math.min(1,x))*32767}
+    e[i]=Math.sqrt(s/1600);
+    if(i%200===0&&performance.now()-t>10){prog(i/n);await sleep(0);t=performance.now()}
+  }
+  pcmKeep=keep;
+  return e;
+}
+/* Analyse légère : lecture accélérée de la piste audio seule, mesurée hors du fil principal (AudioWorklet) */
+const RMS_CODE="class P extends AudioWorkletProcessor{constructor(){super();this.s=0;this.n=0}process(i){const x=i[0]&&i[0][0];if(x){for(let k=0;k<x.length;k++)this.s+=x[k]*x[k];this.n+=x.length;if(this.n>=256){this.port.postMessage(Math.sqrt(this.s/this.n));this.s=0;this.n=0}}return true}}registerProcessor('rms',P)";
+async function energyScan(){
+  let a;
+  try{a=new Audio();a.preload='auto';a.src=url;await once(a,'loadedmetadata')}catch(x){a=await open()}
+  let ac;try{ac=new AudioContext({sampleRate:SR})}catch(x){ac=new AudioContext()}
+  await ac.resume();
+  const e=new Float32Array(Math.ceil(dur*10)+20);let last=-1,mx=0;
+  const onR=r=>{const k=Math.min(e.length-1,Math.floor(a.currentTime*10));for(let j=last+1;j<=k;j++)e[j]=r;if(k>last)last=k;if(r>mx)mx=r};
+  const src=ac.createMediaElementSource(a);let node;
+  try{
+    const u=URL.createObjectURL(new Blob([RMS_CODE],{type:'text/javascript'}));
+    await ac.audioWorklet.addModule(u);URL.revokeObjectURL(u);
+    node=new AudioWorkletNode(ac,'rms');node.port.onmessage=m=>onR(m.data);
+  }catch(x){
+    node=ac.createScriptProcessor(1024,1,1);
+    node.onaudioprocess=ev=>{const d=ev.inputBuffer.getChannelData(0);let s=0;for(let i=0;i<d.length;i++)s+=d[i]*d[i];onR(Math.sqrt(s/d.length))};
+  }
+  src.connect(node);node.connect(ac.destination);
+  const desk=/Chrome|Edg\//.test(navigator.userAgent)&&!/Android|Mobile/.test(navigator.userAgent),rates=desk?[12,6,3,1.5,1]:[6,3,1.5,1];
+  let ri=0,rt=Date.now(),stalled=false;
+  a.playbackRate=rates[0];await a.play().catch(()=>{});
+  await new Promise(res=>{
+    let lt=-1,ts=Date.now();
+    const t=setInterval(()=>{
+      prog(a.currentTime/dur);say('Analyse rapide de la vidéo : '+Math.round(a.currentTime/dur*100)+' %. Gardez cet onglet visible.');
+      if(a.currentTime!==lt){lt=a.currentTime;ts=Date.now()}else if(Date.now()-ts>12000){stalled=true;clearInterval(t);res();return}
+      if(mx===0&&a.currentTime>2&&Date.now()-rt>3500&&ri<rates.length-1){ri++;rt=Date.now();last=-1;mx=0;e.fill(0);a.playbackRate=rates[ri];a.currentTime=0}
+      if(a.ended||abort||a.currentTime>=dur-.15){clearInterval(t);res()}
+    },200);
+  });
+  a.pause();try{node.disconnect()}catch(x){}ac.close();a.removeAttribute('src');a.load();
+  if(stalled)throw new Error('L’analyse s’est bloquée. Essayez avec un fichier MP4 (H.264) plus léger ou plus court.');
+  return e;
+}
+
+/* ---------- Lecture directe de la piste audio d'un MP4 / MOV (sans décoder la vidéo) ---------- */
+const tg=(d,o)=>String.fromCharCode(d.getUint8(o),d.getUint8(o+1),d.getUint8(o+2),d.getUint8(o+3));
+function boxes(d,start,end){
+  const out=[];let o=start;
+  while(o+8<=end){
+    let size=d.getUint32(o),hdr=8;const type=tg(d,o+4);
+    if(size===1){size=Number(d.getBigUint64(o+8));hdr=16}else if(size===0)size=end-o;
+    if(size<hdr||o+size>end)break;
+    out.push({type,s:o+hdr,e:o+size});o+=size;
+  }
+  return out;
+}
+const kid=(d,b,t)=>b&&boxes(d,b.s,b.e).find(x=>x.type===t);
+async function findMoov(f){
+  let o=0;
+  while(o+8<=f.size){
+    const h=new DataView(await f.slice(o,o+16).arrayBuffer());
+    if(h.byteLength<8)break;
+    let size=h.getUint32(0),hdr=8;const type=tg(h,4);
+    if(size===1&&h.byteLength>=16){size=Number(h.getBigUint64(8));hdr=16}else if(size===0)size=f.size-o;
+    if(size<hdr)throw new Error('mp4');
+    if(type==='moov'){if(size>96*1048576)throw new Error('moov');return new DataView(await f.slice(o,o+size).arrayBuffer())}
+    o+=size;
+  }
+  throw new Error('nomoov');
+}
+function parseEsds(d,o,end){
+  const rd=()=>{let n=0,b;do{b=d.getUint8(o++);n=(n<<7)|(b&127)}while((b&128)&&o<end);return n};
+  while(o<end){
+    const t=d.getUint8(o++),len=rd();
+    if(t===3){const fl=d.getUint8(o+2);o+=3;if(fl&0x80)o+=2;if(fl&0x40)o+=1+d.getUint8(o);if(fl&0x20)o+=2}
+    else if(t===4)o+=13;
+    else if(t===5)return new Uint8Array(d.buffer.slice(d.byteOffset+o,d.byteOffset+o+len));
+    else o+=len;
+  }
+  return null;
+}
+async function mp4Open(f){
+  if(typeof AudioDecoder==='undefined'||typeof EncodedAudioChunk==='undefined')throw new Error('webcodecs');
+  const d=await findMoov(f),top=d.getUint32(0)===1?16:8;
+  for(const tr of boxes(d,top,d.byteLength).filter(b=>b.type==='trak')){
+    const mdia=kid(d,tr,'mdia'),hd=kid(d,mdia,'hdlr');
+    if(!hd||tg(d,hd.s+8)!=='soun')continue;
+    const mdhd=kid(d,mdia,'mdhd'),ts=d.getUint8(mdhd.s)===1?d.getUint32(mdhd.s+20):d.getUint32(mdhd.s+12);
+    const stbl=kid(d,kid(d,mdia,'minf'),'stbl'),stsd=kid(d,stbl,'stsd'),ent=boxes(d,stsd.s+8,stsd.e)[0];
+    if(!ent||ent.type!=='mp4a')throw new Error('codec');
+    const ver=d.getUint16(ent.s+8),ch=d.getUint16(ent.s+16),sr=d.getUint16(ent.s+24);
+    const kids=boxes(d,ent.s+28+(ver===1?16:ver===2?36:0),ent.e),es=kids.find(x=>x.type==='esds');
+    if(!es)throw new Error('esds');
+    const asc=parseEsds(d,es.s+4,es.e);if(!asc||asc.length<2)throw new Error('asc');
+    const codec='mp4a.40.'+(asc[0]>>3);
+    const stts=kid(d,stbl,'stts'),stsz=kid(d,stbl,'stsz'),stsc=kid(d,stbl,'stsc'),c32=kid(d,stbl,'stco'),c64=kid(d,stbl,'co64'),co=c32||c64;
+    if(!stts||!stsz||!stsc||!co)throw new Error('tables');
+    const n=d.getUint32(stsz.s+8),fixed=d.getUint32(stsz.s+4),sizes=new Uint32Array(n);
+    for(let i=0;i<n;i++)sizes[i]=fixed||d.getUint32(stsz.s+12+i*4);
+    const times=new Float64Array(n);let k=0,acc=0;const ne=d.getUint32(stts.s+4);
+    for(let i=0;i<ne&&k<n;i++){const c=d.getUint32(stts.s+8+i*8),dl=d.getUint32(stts.s+12+i*8);for(let j=0;j<c&&k<n;j++){times[k++]=acc/ts;acc+=dl}}
+    const nc=d.getUint32(co.s+4),cOff=i=>c32?d.getUint32(co.s+8+i*4):Number(d.getBigUint64(co.s+8+i*8));
+    const nsc=d.getUint32(stsc.s+4),sc=[];for(let i=0;i<nsc;i++)sc.push([d.getUint32(stsc.s+8+i*12),d.getUint32(stsc.s+12+i*12)]);
+    const offs=new Float64Array(n);let e=0;k=0;
+    for(let c=0;c<nc&&k<n;c++){
+      while(e+1<sc.length&&sc[e+1][0]<=c+1)e++;
+      let o=cOff(c);
+      for(let j=0;j<sc[e][1]&&k<n;j++){offs[k]=o;o+=sizes[k];k++}
+    }
+    if(k!==n||n<2)throw new Error('stsc');
+    return{f,sr,ch,asc,codec,n,offs,sizes,times,dur:times[n-1]+1024/sr};
+  }
+  throw new Error('noaudio');
+}
+const lower=(a,x)=>{let lo=0,hi=a.length;while(lo<hi){const m=(lo+hi)>>1;if(a[m]<x)lo=m+1;else hi=m}return lo};
+/* Décode la piste audio entre t0 et t1 : onBlock(Float32Array mono 16 kHz, temps du premier échantillon) */
+async function mp4Range(M,t0,t1,onBlock,onProg){
+  const cfg={codec:M.codec,sampleRate:M.sr,numberOfChannels:M.ch,description:M.asc};
+  const sup=await AudioDecoder.isConfigSupported(cfg);if(!sup.supported)throw new Error('decoder');
+  const a=Math.max(0,lower(M.times,t0)-2),b=Math.min(M.n,lower(M.times,t1)+1);
+  let err=null,base=null,gi=0,bin=-1,acc=0,cnt=0,out=new Float32Array(16000),oi=0,sent=0;
+  const flushOut=()=>{if(oi){onBlock(out.slice(0,oi),base+sent/SR);sent+=oi;oi=0}};
+  const emit=v=>{out[oi++]=v;if(oi===out.length)flushOut()};
+  const dec=new AudioDecoder({
+    output:ad=>{
+      const n=ad.numberOfFrames,x=new Float32Array(n);
+      ad.copyTo(x,{planeIndex:0,format:'f32-planar'});
+      if(ad.numberOfChannels>1){const y=new Float32Array(n);ad.copyTo(y,{planeIndex:1,format:'f32-planar'});for(let i=0;i<n;i++)x[i]=(x[i]+y[i])/2}
+      if(base===null)base=ad.timestamp/1e6;
+      const r=ad.sampleRate/SR;
+      for(let i=0;i<n;i++){const bn=Math.floor((gi+i)/r);if(bn!==bin){if(cnt)emit(acc/cnt);bin=bn;acc=0;cnt=0}acc+=x[i];cnt++}
+      gi+=n;ad.close();
+    },
+    error:e=>{err=e}
+  });
+  try{
+    dec.configure(cfg);
+    const runs=[];
+    for(let k=a;k<b;){let j=k,len=M.sizes[k];while(j+1<b&&M.offs[j+1]===M.offs[j]+M.sizes[j]&&len+M.sizes[j+1]<2097152){j++;len+=M.sizes[j]}runs.push([k,j,M.offs[k],len]);k=j+1}
+    const rd=r=>M.f.slice(r[2],r[2]+r[3]).arrayBuffer(),ahead=[];let ri=0;
+    for(let i=0;i<Math.min(6,runs.length);i++)ahead.push(rd(runs[ri++]));
+    for(let q=0;q<runs.length;q++){
+      if(err)throw err;chk();
+      const buf=new Uint8Array(await ahead.shift()),r=runs[q];
+      if(ri<runs.length)ahead.push(rd(runs[ri++]));
+      let p=0;
+      for(let k=r[0];k<=r[1];k++){dec.decode(new EncodedAudioChunk({type:'key',timestamp:Math.round(M.times[k]*1e6),data:buf.subarray(p,p+M.sizes[k])}));p+=M.sizes[k]}
+      while(dec.decodeQueueSize>60){await sleep(2);if(err)throw err}
+      if(onProg&&q%20===0){onProg(M.times[r[1]]);await sleep(0)}
+    }
+    let tm;const bad=new Promise((_,rej)=>{tm=setInterval(()=>{if(err)rej(err)},50)});
+    try{await Promise.race([dec.flush(),bad])}finally{clearInterval(tm)}
+    if(cnt)emit(acc/cnt);flushOut();
+  }finally{try{dec.close()}catch(x){}}
+}
+async function energyMp4(M){
+  const e=new Float32Array(Math.ceil(dur*10)+20);let acc=0,cnt=0,idx=0;
+  await mp4Range(M,0,M.dur+1,blk=>{
+    for(let i=0;i<blk.length;i++){acc+=blk[i]*blk[i];if(++cnt===1600){if(idx<e.length)e[idx++]=Math.sqrt(acc/1600);acc=0;cnt=0}}
+  },t=>{prog(t/dur);say('Lecture rapide de l’audio : '+Math.min(100,Math.round(t/dur*100))+' %')});
+  return idx>=10?e.slice(0,idx):e;
+}
+
+/* ---------- Audio d'un passage (pour la transcription) ---------- */
+function resample(f,sr){
+  if(Math.abs(sr-SR)<1)return f;
+  const r=sr/SR,n=Math.floor(f.length/r),o=new Float32Array(n);
+  for(let i=0;i<n;i++){const p=i*r,a=Math.floor(p),fr=p-a;o[i]=f[a]*(1-fr)+(f[a+1]===undefined?f[a]:f[a+1])*fr}
+  return o;
+}
+async function tapWindow(s,e){
+  let a;try{a=new Audio();a.preload='auto';a.src=url;await once(a,'loadedmetadata')}catch(x){a=await open()}
+  const ac=new AudioContext();await ac.resume();
+  const src=ac.createMediaElementSource(a),pr=ac.createScriptProcessor(4096,1,1),ch=[];
+  pr.onaudioprocess=ev=>ch.push(new Float32Array(ev.inputBuffer.getChannelData(0)));
+  src.connect(pr);pr.connect(ac.destination);
+  await seek(a,s);await a.play();
+  await new Promise(res=>{const t=setInterval(()=>{prog((a.currentTime-s)/(e-s));if(a.currentTime>=e||a.ended||abort){clearInterval(t);res()}},100)});
+  a.pause();pr.disconnect();const sr=ac.sampleRate;ac.close();a.removeAttribute('src');a.load();chk();
+  const n=ch.reduce((x,c)=>x+c.length,0),all=new Float32Array(n);let o=0;for(const c of ch){all.set(c,o);o+=c.length}
+  return{pcm:resample(all,sr),t0:s};
+}
+async function audioWindow(s,e){
+  s=Math.max(0,s);e=Math.min(dur,e);
+  if(mp4){
+    try{
+      const blocks=[];let base=null;
+      await mp4Range(mp4,s,e,(b,t)=>{if(base===null)base=t;blocks.push(b)});
+      const tot=blocks.reduce((x,b)=>x+b.length,0),all=new Float32Array(tot);let o=0;for(const b of blocks){all.set(b,o);o+=b.length}
+      const a0=Math.max(0,Math.round((s-base)*SR)),a1=Math.min(tot,Math.round((e-base)*SR));
+      return{pcm:all.subarray(a0,a1),t0:base+a0/SR};
+    }catch(x){if(abort)throw x}
+  }
+  if(pcmKeep){
+    const a=Math.floor(s*SR),b=Math.min(pcmKeep.length,Math.floor(e*SR)),o=new Float32Array(Math.max(0,b-a));
+    for(let i=0;i<o.length;i++)o[i]=pcmKeep[a+i]/32768;
+    return{pcm:o,t0:s};
+  }
+  return tapWindow(s,e);
+}
+
+/* ---------- Transcription (dans un processus séparé : l'écran ne fige plus) ---------- */
+const WCODE=`import {pipeline} from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2';
+let asr=null;
+self.onmessage=async ev=>{const m=ev.data;try{
+ if(m.type==='load'){asr=await pipeline('automatic-speech-recognition',m.model,{progress_callback:d=>{if(d.status==='progress'&&isFinite(d.progress))self.postMessage({type:'prog',p:d.progress})}});self.postMessage({type:'ready'})}
+ else if(m.type==='run'){const o={return_timestamps:'word',chunk_length_s:30,stride_length_s:5,task:'transcribe'};if(m.lang)o.language=m.lang;const r=await asr(m.audio,o);self.postMessage({type:'done',id:m.id,chunks:(r.chunks||[]).map(c=>({w:c.text,a:c.timestamp[0],b:c.timestamp[1]}))})}
+}catch(e){self.postMessage({type:'err',id:m.id,msg:String(e&&e.message||e)})}};`;
+function asrKill(){if(asrW){asrW.terminate();asrW=null;asrKey=''}}
+function asrCall(msg,transfer,onProg,timeout){
+  return new Promise((res,rej)=>{
+    const w=asrW;
+    const cleanup=()=>{clearTimeout(tm);clearInterval(ab);w.removeEventListener('message',h);w.removeEventListener('error',er)};
+    const tm=setTimeout(()=>{cleanup();asrKill();rej(new Error('délai dépassé'))},timeout);
+    const ab=setInterval(()=>{if(abort){cleanup();asrKill();rej(new Error('Annulé'))}},300);
+    const h=ev=>{
+      const m=ev.data;
+      if(m.type==='prog'){if(onProg)onProg(m.p)}
+      else if(m.type==='ready'||(m.type==='done'&&m.id===msg.id)){cleanup();res(m)}
+      else if(m.type==='err'){cleanup();rej(new Error(m.msg))}
+    };
+    const er=ev=>{cleanup();asrKill();rej(new Error(ev.message||'le moteur de transcription a échoué'))};
+    w.addEventListener('message',h);w.addEventListener('error',er);w.postMessage(msg,transfer||[]);
+  });
+}
+async function asrReady(){
+  const key=$('#model').value;
+  if(asrW&&asrKey===key)return;
+  asrKill();
+  try{asrW=new Worker(URL.createObjectURL(new Blob([WCODE],{type:'text/javascript'})),{type:'module'})}
+  catch(x){throw new Error('ce navigateur ne permet pas la transcription')}
+  asrKey=key;say('Préparation de la transcription (téléchargement du modèle la première fois)…');prog(null);
+  await asrCall({type:'load',model:key},null,p=>{prog(p/100);say('Téléchargement du modèle de transcription : '+Math.round(p)+' %')},20*60e3);
+}
+async function transcribeWin(s,e){
+  const {pcm,t0}=await audioWindow(s,e);
+  if(!pcm||pcm.length<SR*3)return[];
+  const id=++asrId,arr=pcm.slice();
+  const m=await asrCall({type:'run',id,audio:arr,lang:$('#lang').value},[arr.buffer],null,10*60e3);
+  return m.chunks.filter(c=>c.w&&c.w.trim()&&c.a!=null).map(c=>({w:c.w.trim(),a:t0+c.a,b:t0+(c.b==null?c.a+.4:c.b)}));
+}
+function wordsToCues(ws){
+  const out=[];let cur=[];
+  const flush=()=>{if(cur.length){out.push({a:cur[0].a,b:cur[cur.length-1].b,text:cur.map(x=>x.w).join(' ')});cur=[]}};
+  for(const w of ws){
+    const last=cur[cur.length-1];
+    if(last&&(cur.length>=7||w.a-last.b>.7||(cur.length>=3&&/[.!?…]["»”)]*$/.test(last.w))||cur.map(x=>x.w).join(' ').length>40))flush();
+    cur.push(w);
+  }
+  flush();
+  return out;
+}
+function addAutoCues(list,from,to){
+  cues=cues.filter(c=>c.b<=from||c.a>=to).concat(list.filter(c=>c.b>from-.5&&c.a<to+.5)).sort((a,b)=>a.a-b.a);
+  const o=[];for(const c of cues){const p=o[o.length-1];if(p&&c.a<p.b-.15)continue;o.push(c)}
+  cues=o;cuesAuto=true;
+}
+const covered=x=>cues.reduce((a,c)=>a+Math.max(0,Math.min(c.b,x.e)-Math.max(c.a,x.s)),0);
+/* Passage ajouté à la main ou modifié : transcrit à la demande */
+async function ensureCues(x){
+  if(!$('#tx').checked||(cues.length&&!cuesAuto))return;
+  if(covered(x)>=(x.e-x.s)*.35)return;
+  try{
+    step(2);say('Transcription du passage…');prog(null);
+    await asrReady();chk();
+    const s=Math.max(0,x.s-1),e=Math.min(dur,x.e+1),cs=wordsToCues(await transcribeWin(s,e));
+    addAutoCues(cs,s,e);
+  }catch(err){if(err.message==='Annulé')throw err}
+}
+/* Présélection par le son, puis choix final selon le contenu */
+async function understand(e,N,lo,hi,mode){
+  const K=Math.min(N+4,24),cand=pick(e,K,lo,hi,mode);
+  if(cand.length<2)return null;
+  step(1);await asrReady();chk();
+  const t0=Date.now();let failed=0;
+  for(let i=0;i<cand.length;i++){
+    chk();
+    say('Compréhension du contenu : passage '+(i+1)+' sur '+cand.length+(i?' · reste environ '+eta((Date.now()-t0)/i*(cand.length-i)/1000):'')+'…');prog(i/cand.length);
+    const s=Math.max(0,cand[i].s-1.5),en=Math.min(dur,cand[i].e+2.5);
+    try{addAutoCues(wordsToCues(await transcribeWin(s,en)),s,en)}
+    catch(err){if(err.message==='Annulé')throw err;if(++failed>=2)break}
+  }
+  prog(undefined);
+  if(!cues.length)return null;
+  const freq={};cues.forEach(c=>(c.text.toLowerCase().match(/[\p{L}]{5,}/gu)||[]).forEach(w=>{if(!SW.has(w))freq[w]=(freq[w]||0)+1}));
+  const rows=cand.map(x=>{
+    const cs=cuesFor(x),len=Math.max(1,x.e-x.s),words=cs.reduce((a,c)=>a+c.text.split(/\s+/).length,0);
+    return{x,cs,words,t:cs.reduce((a,c)=>a+cueScore(c.text,freq)*(c.b-c.a),0)/len};
+  });
+  const ok=rows.filter(r=>r.words>=12).sort((a,b)=>a.t-b.t);
+  ok.forEach((r,i)=>r.rt=ok.length>1?i/(ok.length-1):.5);
+  rows.forEach(r=>{if(r.words<12){r.rt=0;r.pen=.5}else r.pen=1;r.final=(.5*r.x.sc+.5*r.rt)*r.pen});
+  const keep=rows.sort((a,b)=>b.final-a.final).slice(0,N);
+  keep.forEach(r=>{
+    r.x.score=Math.round(35+65*r.final);
+    if(r.rt>=.85&&r.pen===1)r.x.why=['Contenu marquant'].concat(r.x.why).slice(0,3);
+  });
+  const sel=keep.map(r=>r.x).sort((a,b)=>a.s-b.s);
+  sel.forEach((x,i)=>{
+    Object.assign(x,snap(x,hi));
+    const cs=cuesFor(x);
+    if(cs.length){const a=x.s+cs[0].a,b=x.s+cs[cs.length-1].b;if(a>x.s+1)x.s=Math.max(0,a-.2);if(b<x.e-1.5)x.e=b+.3}
+    if(i&&x.s<sel[i-1].e)x.s=sel[i-1].e+.1;
+  });
+  const res=sel.filter(x=>x.e-x.s>=8);
+  res.forEach(x=>{x.text=cuesFor(x).map(c=>c.text).join(' ').slice(0,120)});
+  return res;
+}
+
+/* ---------- Choix des passages ---------- */
+const MARK=new RegExp('(?<![\\p{L}])(?:secret|vérité|verite|attention|erreur|jamais|toujours|incroyable|miracle|important|imagine|astuce|conseil|problème|probleme|solution|pourquoi|comment|dieu|amour|foi|changer|truth|never|always|mistake|why|how|key|amazing|promesse|promise|écoute|ecoute|regarde|listen|look)(?![\\p{L}])','giu');
+function cueScore(t,freq){
+  let s=0;
+  if(/\?/.test(t))s+=2;if(/!/.test(t))s+=1.5;if(/\d/.test(t))s+=1;
+  s+=Math.min(3,(t.match(MARK)||[]).length*1.5);
+  let k=0;(t.toLowerCase().match(/[\p{L}]{5,}/gu)||[]).forEach(w=>{if(!SW.has(w)&&freq[w]>=3)k+=.4});s+=Math.min(3,k);
+  const wc=t.split(/\s+/).length;if(wc>=6&&wc<=28)s+=1;
+  return s;
+}
+const WT=[.15,.10,.20,.12,.10,.10,.05,.05,0,.13],CAP=[1,1.5,.25,.3,1.5,1,1,1,1.5,1.6];
+const WHY=[[2,'Voix qui monte'],[3,'Moment fort'],[8,'Contenu marquant'],[4,'Début accrocheur'],[5,'Fin nette'],[0,'Parole continue'],[9,'Voix intense']];
+function pick(e,N,lo,hi,mode,avoid){
+  avoid=avoid||[];
+  const n=e.length,so=Float32Array.from(e).sort(),q=p=>so[Math.min(n-1,Math.floor(n*p))];
+  const nf=q(.05),med=q(.5),thr=Math.max(nf*2.5,med*.2),p90=q(.9),sp=new Uint8Array(n);
+  for(let i=0;i<n;i++)sp[i]=e[i]>thr?1:0;
+  for(let i=0;i<n;){if(sp[i]){i++;continue}let j=i;while(j<n&&!sp[j])j++;if(j-i<3&&i>0&&j<n)sp.fill(1,i,j);i=j}
+  const P=new Float64Array(n+1),S=new Float64Array(n+1),Q=new Float64Array(n+1);
+  for(let i=0;i<n;i++){P[i+1]=P[i]+sp[i];S[i+1]=S[i]+e[i];Q[i+1]=Q[i]+e[i]*e[i]}
+  const mean=S[n]/n||1e-9,B=[0],plen=new Map([[0,0],[n,4]]),LPm=new Uint8Array(n),EMm=new Uint8Array(n),PKm=new Uint8Array(n);
+  /* pauses : longueur de chaque pause, pauses longues (silences morts) */
+  for(let i=0;i<n;){if(sp[i]){i++;continue}let j=i;while(j<n&&!sp[j])j++;const L=j-i;if(L>=5){const m=Math.round((i+j)/2);B.push(m);plen.set(m,L)}if(L>=30)LPm.fill(1,i,j);i=j}
+  B.push(n);
+  /* insistance : énergie nettement au-dessus de la moyenne locale (±15 s) ; moments forts : énergie haute tenue plus d'une seconde */
+  for(let i=0;i<n;i++){
+    const a=Math.max(0,i-75),b=Math.min(n,i+76),m=(S[b]-S[a])/(b-a),v=Math.max(0,(Q[b]-Q[a])/(b-a)-m*m);
+    if(sp[i]&&(e[i]-m)/(Math.sqrt(v)+1e-9)>1)EMm[i]=1;
+  }
+  for(let i=0;i<n;){if(e[i]<=p90){i++;continue}let j=i;while(j<n&&e[j]>p90)j++;if(j-i>=10)PKm.fill(1,i,j);i=j}
+  const pre=m=>{const a=new Float64Array(n+1);for(let i=0;i<n;i++)a[i+1]=a[i]+m[i];return a},PE=pre(EMm),PK=pre(PKm),PL=pre(LPm);
+  /* contenu : si des sous-titres sont fournis, chaque ligne reçoit une note (question, chiffre, mot fort, thème récurrent…) */
+  const hasT=cues.length>0&&!cuesAuto,TX=new Float64Array(n+1);
+  if(hasT){
+    const freq={},arr=new Float32Array(n);
+    cues.forEach(c=>(c.text.toLowerCase().match(/[\p{L}]{5,}/gu)||[]).forEach(w=>{if(!SW.has(w))freq[w]=(freq[w]||0)+1}));
+    cues.forEach(c=>{const a=Math.max(0,Math.floor(c.a*10)),b=Math.min(n,Math.max(a+1,Math.ceil(c.b*10))),v=cueScore(c.text,freq)/(b-a);for(let i=a;i<b;i++)arr[i]+=v});
+    for(let i=0;i<n;i++)TX[i+1]=TX[i]+arr[i];
+  }
+  const wt=hasT?WT.map((w,k)=>k===8?.3:w*.7):WT;
+  const feat=(x,y)=>{
+    const len=y-x,mu=(S[y]-S[x])/len,sd=Math.sqrt(Math.max(0,(Q[y]-Q[x])/len-mu*mu)),h8=Math.min(8,len),
+      hk=(S[Math.min(y,x+30)]-S[x])/Math.min(30,len)/mean,lead=(P[x+h8]-P[x])/h8,tail=(S[y]-S[Math.max(x,y-15)])/Math.min(15,len);
+    return[(P[y]-P[x])/len,sd/mean,(PE[y]-PE[x])/len,(PK[y]-PK[x])/len,hk*lead,.6*Math.min(1,(plen.get(y)||0)/10)+.4*(tail<mu?1:.4),Math.min(1,(plen.get(x)||0)/8),1-(PL[y]-PL[x])/len,hasT?(TX[y]-TX[x])/len*10:0,mu/mean];
+  };
+  /* étape 1 : pour chaque départ possible, la meilleure fin ; étape 2 : classement relatif à toute la vidéo */
+  const raw=(bs,l,h,from,to)=>{
+    const out=[],tgt=(l+h)/2;
+    for(let a=0;a<bs.length;a++){
+      if(bs[a]<from)continue;if(bs[a]>=to)break;
+      let best=null;
+      for(let b=a+1;b<bs.length;b++){
+        if(bs[b]>to)break;
+        const d=(bs[b]-bs[a])/10;if(d<l)continue;if(d>h)break;
+        const f=feat(bs[a],bs[b]);let c=.08*(1-Math.abs(d-tgt)/(h-l+1e-9));
+        for(let k=0;k<10;k++)c+=wt[k]*Math.min(1,f[k]/CAP[k]);
+        if(!best||c>best.c)best={s:bs[a]/10,e:bs[b]/10,f,c};
+      }
+      if(best)out.push(best);
+    }
+    return out;
+  };
+  const rank=list=>{
+    const m=list.length,nv=list.map(()=>new Float32Array(10));
+    for(let k=0;k<10;k++){
+      if(!wt[k])continue;
+      const idx=list.map((_,i)=>i).sort((i,j)=>list[i].f[k]-list[j].f[k]);
+      for(let t=0;t<m;){let u=t;while(u+1<m&&list[idx[u+1]].f[k]===list[idx[t]].f[k])u++;const v=m>1?(t+u)/2/(m-1):.5;for(let z=t;z<=u;z++)nv[idx[z]][k]=v;t=u+1}
+    }
+    list.forEach((x,i)=>{
+      let s=0;for(let k=0;k<10;k++)s+=wt[k]*nv[i][k];
+      x.sc=s;x.score=Math.round(35+65*s);x.why=[];
+      for(const w of WHY){if(wt[w[0]]&&nv[i][w[0]]>=.85&&x.why.length<3)x.why.push(w[1])}
+    });
+    return list;
+  };
+  const cands=(bs,l,h,from,to)=>rank(raw(bs,l,h,from,to));
+  const grid=[];for(let i=0;i<=n;i+=30)grid.push(i);
+  const BG=[...new Set(B.concat(grid))].sort((a,b)=>a-b);
+  const sel=[],free=x=>{for(const y of sel)if(!(x.e+3<=y.s||x.s>=y.e+3))return false;for(const y of avoid)if(!(x.e+3<=y.s||x.s>=y.e+3))return false;return true};
+  if(mode==='spread'){
+    for(let k=0;k<N;k++){
+      const from=Math.floor(n*k/N),to=Math.floor(n*(k+1)/N),span=(to-from)/10,l=Math.max(8,Math.min(lo,span*.85)),h=Math.max(l+1,Math.min(hi,span));
+      let c=cands(B,l,h,from,to);if(!c.length)c=cands(BG,l,h,from,to);
+      if(c.length){c.sort((a,b)=>b.sc-a.sc);sel.push(c[0])}
+    }
+  }else if(mode==='smart'){
+    /* les passages les plus intéressants, mais jamais tous collés au même endroit */
+    const pool=cands(B,lo,hi,0,n),D=Math.max(60,dur/(N*1.5));
+    while(sel.length<N){
+      let best=null,bv=-1;
+      for(const x of pool){
+        if(!free(x))continue;
+        let pen=0;const c=(x.s+x.e)/2;
+        for(const y of sel){const d=Math.abs(c-(y.s+y.e)/2);if(d<D)pen+=.25*(1-d/D)}
+        if(x.sc-pen>bv){bv=x.sc-pen;best=x}
+      }
+      if(!best)break;sel.push(best);
+    }
+  }
+  if(sel.length<N){
+    for(const t of [[lo,hi,B],[lo,hi,BG],[lo*.6,hi,BG],[lo*.35,hi*.8,BG]]){
+      const l=Math.max(8,t[0]),h=Math.max(l+2,t[1]),c=cands(t[2],l,h,0,n).sort((a,b)=>b.sc-a.sc);
+      for(const x of c){if(sel.length>=N)break;if(free(x))sel.push(x)}
+      if(sel.length>=N)break;
+    }
+  }
+  sel.forEach(x=>{
+    let a=Math.round(x.s*10),b=Math.round(x.e*10);
+    while(a<b&&!sp[a])a++;while(b>a&&!sp[b-1])b--;
+    if((b-a)/10>=Math.min(lo,(x.e-x.s))*.8){x.s=Math.max(0,a/10-.25);x.e=Math.min(dur,b/10+.4)}
+  });
+  const out=sel.map(x=>snap(x,hi)).sort((a,b)=>a.s-b.s),res=[];
+  for(const x of out){
+    for(const y of avoid){if(x.s<y.e&&x.e>y.s){if(x.s<y.s)x.e=Math.min(x.e,y.s-.1);else x.s=Math.max(x.s,y.e+.1)}}
+    const p=res[res.length-1];
+    if(p&&x.s<p.e+.5)x.s=p.e+.5;
+    if(x.e-x.s>=8)res.push(x);
+  }
+  return res;
+}
+function drawWave(e,sel){
+  const cv=$('#wave'),d=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;
+  cv.width=w*d;cv.height=h*d;
+  const g=cv.getContext('2d'),ink=getComputedStyle(document.documentElement).getPropertyValue('--ink'),n=e.length;
+  const so=Float32Array.from(e).sort(),mx=so[Math.floor(n*.98)]||1;
+  g.scale(d,d);
+  g.fillStyle='#ffd93d';g.globalAlpha=.6;
+  sel.forEach(c=>g.fillRect(c.s/dur*w,0,Math.max(2,(c.e-c.s)/dur*w),h));
+  g.globalAlpha=1;g.fillStyle=ink;
+  for(let x=0;x<w;x++){
+    const a=Math.floor(x/w*n),b=Math.max(a+1,Math.floor((x+1)/w*n));let m=0;
+    for(let i=a;i<b&&i<n;i++)m=Math.max(m,e[i]);
+    const bh=Math.max(1,Math.min(1,m/mx)*h*.9);g.fillRect(x,(h-bh)/2,1,bh);
+  }
+}
+
+/* ---------- Validation des passages ---------- */
+function paintItem(el,p,i){
+  el.dataset.i=i;
+  el.querySelector('b').textContent='Passage '+(i+1)+(p.done?' · monté':'');
+  el.querySelector('[type=checkbox]').checked=p.on;
+  el.querySelector('[data-k=s]').value=p.s.toFixed(1);
+  el.querySelector('[data-k=e]').value=p.e.toFixed(1);
+  el.querySelector('.snip').textContent=p.text?'« '+p.text+(p.text.length>=120?'…':'')+' »':'';
+  el.querySelector('.why').textContent=p.score?'★ '+p.score+'/100'+(p.why&&p.why.length?' · '+p.why.join(' · '):''):'';
+  const L=p.e-p.s;el.querySelector('.len').textContent=fmt(p.s)+' → '+fmt(p.e)+' · '+Math.round(L)+' s'+(L<5?' (trop court)':L>180?' (trop long)':'');
+}
+function showRev(){
+  const box=$('#revlist');box.innerHTML='';
+  props.forEach((p,i)=>{
+    const el=document.createElement('div');el.className='item';
+    el.innerHTML='<canvas width="96" height="54"></canvas><label class="chk"><input type="checkbox"><b></b></label><label>Début (s)<input type="number" step="0.1" min="0" data-k="s"></label><label>Fin (s)<input type="number" step="0.1" data-k="e"></label><span class="len"></span><span class="why"></span><span class="snip"></span><span class="btns"><button type="button" data-a="play">Écouter</button><button type="button" data-a="del">Retirer</button></span>';
+    paintItem(el,p,i);box.append(el);
+  });
+  $('#rev').hidden=false;
+  if(lastE)drawWave(lastE,props.filter(p=>p.on||p.done));
+  thumbs();
+}
+let thumbTok=0,thumbT=0;
+async function thumbs(){
+  const tok=++thumbTok;let tv=null;
+  try{
+    tv=await open();
+    const els=[...document.querySelectorAll('#revlist .item')];
+    for(const el of els){
+      if(tok!==thumbTok)break;
+      const p=props[+el.dataset.i];if(!p)continue;
+      await Promise.race([seek(tv,Math.min(dur-.5,p.s+.5)),sleep(3000)]);
+      if(tok!==thumbTok)break;
+      if(tv.readyState>=2)el.querySelector('canvas').getContext('2d').drawImage(tv,0,0,96,54);
+    }
+  }catch(e){}
+  if(tv){tv.removeAttribute('src');tv.load()}
+}
+function revChange(ev){
+  const el=ev.target.closest('.item');if(!el)return;
+  const p=props[+el.dataset.i],t=ev.target;
+  if(t.type==='checkbox')p.on=t.checked;
+  else{const x=parseFloat(t.value);if(isFinite(x))p[t.dataset.k]=Math.min(dur,Math.max(0,x))}
+  paintItem(el,p,+el.dataset.i);
+  if(lastE)drawWave(lastE,props.filter(q=>q.on||q.done));
+  if(t.dataset.k==='s'){clearTimeout(thumbT);thumbT=setTimeout(thumbs,600)}
+}
+function revClick(ev){
+  const b=ev.target.closest('button'),el=ev.target.closest('.item');if(!b||!el)return;
+  const i=+el.dataset.i,p=props[i],v=$('#pv');
+  if(b.dataset.a==='play'){v.currentTime=p.s;stopAt=p.e;v.play().catch(()=>{});v.scrollIntoView({block:'nearest',behavior:'smooth'})}
+  if(b.dataset.a==='del'){props.splice(i,1);showRev()}
+}
+
+/* ---------- Montage ---------- */
+function wrap(g,t,mw){
+  const out=[];let l='';
+  for(const w of t.split(/\s+/)){const x=l?l+' '+w:w;if(g.measureText(x).width>mw&&l){out.push(l);l=w}else l=x}
+  if(l)out.push(l);
+  return out;
+}
+function pill(g,x,y,w,h){g.beginPath();if(g.roundRect)g.roundRect(x,y,w,h,h/2);else g.rect(x,y,w,h);g.fill()}
+function drawBadge(g,W,H,t){
+  const fs=W*.04;g.font='800 '+fs+'px '+FONT;g.textAlign='left';
+  const w=g.measureText(t).width+fs*1.2,h=fs*1.7,x=W*.05,y=H*.04;
+  g.fillStyle='#3a3cff';pill(g,x,y,w,h);g.fillStyle='#fff';g.fillText(t,x+fs*.6,y+h/2);
+}
+function drawTitle(g,W,H,title,t,low){
+  if(t>3||t<0||!title)return;
+  const fs=W*.052;g.font='800 '+fs+'px '+FONT;g.textAlign='center';
+  const mw=W*.8,lines=wrap(g,title,mw).slice(0,3),lh=fs*1.25,pad=fs*.6;
+  const bw=Math.min(mw,Math.max(...lines.map(l=>g.measureText(l).width)))+pad*2,bh=lines.length*lh+pad*1.2,x=(W-bw)/2,y=H*(low?.1:.07);
+  g.globalAlpha=t>2.6?(3-t)/.4:1;
+  g.fillStyle='rgba(255,255,255,.95)';g.beginPath();
+  if(g.roundRect)g.roundRect(x,y,bw,bh,fs*.4);else g.rect(x,y,bw,bh);
+  g.fill();g.fillStyle='#13213f';
+  lines.forEach((l,i)=>g.fillText(l,W/2,y+pad*.6+lh*(i+.5)));
+  g.globalAlpha=1;
+}
+function drawCaps(g,W,H,chunks,t,sty){
+  let ch=null;for(let i=chunks.length-1;i>=0;i--){if(chunks[i].a<=t&&t<chunks[i].b+.05){ch=chunks[i];break}}
+  if(!ch)return;
+  const fs=W*.06;g.font='800 '+fs+'px '+FONT;g.textAlign='left';g.lineJoin='round';g.lineWidth=fs*.2;
+  if(!ch.L||ch.fs!==fs){
+    const sp=g.measureText(' ').width,mw=W*.86,L=[];let cur=[],cw=0;
+    ch.ws.forEach((x,i)=>{x.m=g.measureText(x.w).width;if(cur.length&&cw+sp+x.m>mw){L.push({ix:cur,w:cw});cur=[];cw=0}cw+=(cur.length?sp:0)+x.m;cur.push(i)});
+    if(cur.length)L.push({ix:cur,w:cw});
+    ch.L=L;ch.fs=fs;ch.sp=sp;
+  }
+  const lh=fs*1.3,y0=H*.72-(ch.L.length-1)*lh/2;
+  ch.L.forEach((ln,li)=>{
+    let x=(W-ln.w)/2;const y=y0+li*lh;
+    ln.ix.forEach(i=>{const w=ch.ws[i];g.strokeStyle='#000';g.strokeText(w.w,x,y);g.fillStyle=t>=w.a&&t<w.b?sty[0]:sty[1];g.fillText(w.w,x,y);x+=w.m+ch.sp});
+  });
+}
+async function seekTo(v,t){
+  for(let i=0;i<5;i++){
+    try{
+      if(Math.abs(v.currentTime-t)<0.15)return;
+      v.currentTime=t;
+      await Promise.race([once(v,'seeked'),sleep(i<2?2500:4000)]);
+      if(Math.abs(v.currentTime-t)<1.5)return;
+    }catch(e){}
+    await sleep(200+i*100);
+  }
+  // last try with play/pause to force
+  try{v.pause();v.currentTime=t;await sleep(400);if(Math.abs(v.currentTime-t)<2)return}catch(e){}
+  throw new Error('Cette vidéo ne permet pas de se déplacer dans le temps (fichier sans index). Convertissez-la en MP4 (H.264) puis réessayez.');
+}
+async function render(c,onp){
+  const q=$('#qual').value,hq=q==='1080',lite=q==='540',W=lite?540:hq?1080:720,H=lite?960:hq?1920:1280;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const g=cv.getContext('2d',{alpha:false}),bg=document.createElement('canvas');bg.width=36;bg.height=64;
+  const bc=bg.getContext('2d');g.textBaseline='middle';g.imageSmoothingQuality='high';
+  try{await document.fonts.load('800 40px '+FONT)}catch(e){}
+  const v=await open(),ac=new AudioContext(),dst=ac.createMediaStreamDestination(),gn=ac.createGain();
+  await ac.resume();
+  const src=ac.createMediaElementSource(v);
+  if($('#nm').checked){
+    const comp=ac.createDynamicsCompressor(),mk=ac.createGain();
+    comp.threshold.value=-24;comp.knee.value=20;comp.ratio.value=3;comp.attack.value=.005;comp.release.value=.2;mk.gain.value=1.25;
+    src.connect(comp);comp.connect(mk);mk.connect(gn);
+  }else src.connect(gn);
+  gn.connect(dst);
+  await seekTo(v,c.s);if(v.readyState<2)await once(v,'loadeddata');
+  let mime=MIMES.find(m=>MediaRecorder.isTypeSupported(m));
+  if(!mime)throw new Error('Aucun format d’enregistrement supporté par ce navigateur.');
+  const st=cv.captureStream(30);
+  const vt=st.getVideoTracks()[0];if(vt&&'contentHint' in vt)vt.contentHint='motion';
+  dst.stream.getAudioTracks().forEach(t=>st.addTrack(t));
+  const vBit=hq?8e6:lite?2.5e6:4.5e6; // slightly lower for reliability
+  let rec,parts=[],recErr=null;
+  const makeRec=()=>{
+    try{
+      rec=new MediaRecorder(st,{mimeType:mime,videoBitsPerSecond:vBit,audioBitsPerSecond:128e3});
+    }catch(e){
+      // fallback lower
+      mime=MIMES.find(m=>m!==mime&&MediaRecorder.isTypeSupported(m))||mime;
+      rec=new MediaRecorder(st,{mimeType:mime,videoBitsPerSecond:Math.min(vBit,3e6),audioBitsPerSecond:96e3});
+    }
+    parts=[];
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)parts.push(e.data)};
+    rec.onerror=e=>{recErr=e.error||e;try{rec.stop()}catch(x){}};
+  };
+  makeRec();
+  const stopped=new Promise((r,rej)=>{
+    rec.onstop=()=>{if(recErr)rej(recErr);else r()};
+  });
+  const fit=$('#fit').value,hook=$('#hook').checked,sty=STY[$('#sty').value];
+  const badge=c.badge||'',title=hook?c.title:'',chunks=$('#cap').checked?chunkCues(c.cues||[]):[];
+  const draw=()=>{
+    const t=v.currentTime-c.s,sw=v.videoWidth||1,sh=v.videoHeight||1;
+    if(fit==='blur'){
+      const kb=Math.max(36/sw,64/sh);bc.drawImage(v,(36-sw*kb)/2,(64-sh*kb)/2,sw*kb,sh*kb);
+      g.drawImage(bg,0,0,W,H);g.fillStyle='rgba(0,0,0,.4)';g.fillRect(0,0,W,H);
+      const k=Math.min(W/sw,H/sh);g.drawImage(v,(W-sw*k)/2,(H-sh*k)/2,sw*k,sh*k);
+    }else{
+      const k=Math.max(W/sw,H/sh);g.drawImage(v,(W-sw*k)/2,(H-sh*k)/2,sw*k,sh*k);
+    }
+    if(badge)drawBadge(g,W,H,badge);
+    drawTitle(g,W,H,title,t,!!badge);
+    drawCaps(g,W,H,chunks,t,sty);
+    const f=Math.min(1,t/.15,(c.e-v.currentTime)/.2);
+    if(f<1){g.fillStyle='rgba(0,0,0,'+(1-Math.max(0,f))+')';g.fillRect(0,0,W,H)}
+  };
+  const vis=()=>{
+    if(document.hidden){v.pause();if(rec.state==='recording')rec.pause()}
+    else{if(rec.state==='paused')rec.resume();v.play().catch(()=>{})}
+  };
+  const t0=ac.currentTime;gn.gain.setValueAtTime(0,t0);gn.gain.linearRampToValueAtTime(1,t0+.15);
+  let bad=false;
+  // Draw a few frames before starting to prime the stream
+  for(let i=0;i<3;i++){draw();await sleep(16)}
+  try{
+    rec.start(250); // smaller timeslice for more reliable data
+  }catch(e){
+    // last resort: try without bitrate
+    mime=MIMES.find(m=>MediaRecorder.isTypeSupported(m));
+    makeRec();
+    rec.start(250);
+  }
+  await v.play().catch(()=>{});
+  document.addEventListener('visibilitychange',vis);
+  await new Promise(res=>{
+    let done=false,fo=false;
+    const fin=()=>{if(v.currentTime<c.s-2){bad=true;return true}return v.currentTime>=c.e||v.ended||abort};
+    const stop=()=>{if(!done){done=true;clearInterval(wd);res()}};
+    const wd=setInterval(()=>{if(fin())stop()},200);
+    const tick=()=>{
+      if(done)return;
+      draw();
+      if(onp)onp(Math.min(1,(v.currentTime-c.s)/(c.e-c.s)));
+      if(!fo&&c.e-v.currentTime<.25){fo=true;const n=ac.currentTime;gn.gain.cancelScheduledValues(n);gn.gain.setValueAtTime(gn.gain.value,n);gn.gain.linearRampToValueAtTime(0,n+Math.max(.05,c.e-v.currentTime))}
+      if(fin())stop();else if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(tick);else requestAnimationFrame(tick);
+    };
+    tick();
+  });
+  document.removeEventListener('visibilitychange',vis);
+  if(bad){v.pause();try{if(rec.state!=='inactive')rec.stop()}catch(e){}ac.close();throw new Error('Cette vidéo ne permet pas de se déplacer dans le temps (fichier sans index). Convertissez-la en MP4 (H.264) puis réessayez.')}
+  v.pause();
+  // ensure last frames
+  draw();await sleep(120);
+  try{if(rec.state!=='inactive')rec.stop()}catch(e){}
+  await stopped.catch(e=>{throw new Error('Échec de l’enregistrement : '+(e.message||e.name||'codec non supporté. Essayez qualité 540 ou 720.'))});
+  ac.close();v.removeAttribute('src');v.load();cv.width=cv.height=0;
+  chk();
+  if(!parts.length||parts.reduce((s,p)=>s+p.size,0)<1000)throw new Error('Clip vide produit. Essayez une autre qualité ou convertissez la vidéo en MP4 H.264.');
+  return new Blob(parts,{type:mime.split(';')[0]||'video/webm'});
+}
+
+/* ---------- ZIP (sans compression) ---------- */
+const CT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc=u=>{let c=-1;for(let i=0;i<u.length;i++)c=CT[(c^u[i])&255]^(c>>>8);return(c^-1)>>>0};
+async function zip(fs){
+  const enc=new TextEncoder(),parts=[],cen=[],d=new Date();let off=0;
+  const dt=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1),dd=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+  for(const f of fs){
+    const data=new Uint8Array(await f.blob.arrayBuffer()),nm=enc.encode(f.name),c=crc(data);
+    const h=new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,dt,true);h.setUint16(12,dd,true);
+    h.setUint32(14,c,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,nm.length,true);
+    parts.push(h.buffer,nm,data);
+    const k=new DataView(new ArrayBuffer(46));
+    k.setUint32(0,0x02014b50,true);k.setUint16(4,20,true);k.setUint16(6,20,true);k.setUint16(8,0x0800,true);k.setUint16(12,dt,true);k.setUint16(14,dd,true);
+    k.setUint32(16,c,true);k.setUint32(20,data.length,true);k.setUint32(24,data.length,true);k.setUint16(28,nm.length,true);k.setUint32(42,off,true);
+    cen.push(k.buffer,nm);
+    off+=30+nm.length+data.length;
+  }
+  let cs=0;cen.forEach(b=>cs+=b.byteLength);
+  const e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,fs.length,true);e.setUint16(10,fs.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...parts,...cen,e.buffer],{type:'application/zip'});
+}
+
+/* ---------- Résultats ---------- */
+function addCard(c,blob,n){
+  c.blob=blob;c.u=URL.createObjectURL(blob);c.num=n;c.ext=blob.type.includes('mp4')?'mp4':'webm';clips.push(c);
+  const el=document.createElement('article');
+  el.innerHTML='<video controls playsinline></video><div class="meta"><label>Titre TikTok<textarea rows="2" placeholder="Écrivez votre titre ici"></textarea></label><label>Hashtags<input type="text"></label><p class="mt"></p><div class="btns"><a class="btn">Télécharger</a><button type="button" data-a="copy">Copier titre et hashtags</button><button type="button" data-a="redo">Incruster le titre</button><button type="button" data-a="srt">Sous-titres (.srt)</button><button type="button" data-a="del">Supprimer</button></div></div>';
+  const v=el.querySelector('video'),ta=el.querySelector('textarea'),tg=el.querySelector('input'),dl=el.querySelector('a');
+  v.src=c.u;ta.value=c.title;tg.value=c.tags;
+  if(!(c.cues&&c.cues.length))el.querySelector('[data-a=srt]').hidden=true;
+  el.querySelector('.mt').textContent=Math.round(c.e-c.s)+' s · extrait de '+fmt(c.s)+' à '+fmt(c.e);
+  c.base=()=>String(c.num).padStart(2,'0')+'-'+(slug(ta.value)||'clip');
+  dl.href=c.u;dl.download=c.base()+'.'+c.ext;dl.onclick=()=>{dl.download=c.base()+'.'+c.ext};
+  el.addEventListener('click',async ev=>{
+    const b=ev.target.closest('button'),a=b&&b.dataset.a;if(!a)return;
+    if(a==='copy'){
+      try{await navigator.clipboard.writeText((ta.value+'\n'+tg.value).trim());b.textContent='Copié'}catch(e){ta.select();b.textContent='Copiez à la main'}
+      setTimeout(()=>b.textContent='Copier titre et hashtags',1800);
+    }
+    if(a==='srt')save(new Blob([srtOf(c.cues)],{type:'text/plain'}),c.base()+'.srt');
+    if(a==='del'){
+      if(busy)return say('Un montage est en cours.',true);
+      URL.revokeObjectURL(c.u);clips=clips.filter(x=>x!==c);el.remove();if(!clips.length)$('#out').hidden=true;
+    }
+    if(a==='redo'){
+      guarded(async()=>{
+        c.title=ta.value.trim();$('#hook').checked=true;step(2);say('Nouveau montage du clip…');
+        const nb=await render(c,prog);
+        URL.revokeObjectURL(c.u);c.blob=nb;c.u=URL.createObjectURL(nb);v.src=c.u;dl.href=c.u;step(3);say('Clip mis à jour.');
+      });
+    }
+  });
+  $('#grid').append(el);
+}
+
+/* ---------- Déroulement ---------- */
+async function guarded(fn){
+  if(busy)return say('Un traitement est déjà en cours.',true);
+  busy=true;abort=false;lock(true);keepAwake(true);
+  try{await fn()}
+  catch(err){
+    prog(undefined);
+    say(err.message==='Annulé'?'Traitement annulé.':err.name==='NotAllowedError'?'Le navigateur a bloqué la lecture automatique. Cliquez de nouveau sur le bouton.':(err.message||String(err)),true);
+    if(clips.length)$('#out').hidden=false;
+  }finally{busy=false;lock(false);keepAwake(false)}
+}
+function analyze(){
+  if(!file)return;
+  if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)return say('Votre navigateur ne peut pas enregistrer de vidéo. Utilisez Chrome, Edge ou Safari récent.',true);
+  return guarded(async()=>{
+    clearResults();step(0);prog(null);say('Lecture et analyse de l’audio…');
+    await sleep(30);
+    mp4=null;pcmKeep=null;if(cuesAuto){cues=[];cuesAuto=false}
+    let e=null;
+    const quiet=a=>{const o=Float32Array.from(a).sort();return o[Math.floor(o.length*.9)]<.0006};
+    if(/\.(mp4|m4v|mov|m4a)$/i.test(file.name)||/mp4|quicktime/.test(file.type)){
+      try{const M=await mp4Open(file);e=await energyMp4(M);if(quiet(e))e=null;else mp4=M}catch(x){if(abort)throw x;e=null;mp4=null}
+    }
+    chk();
+    if(!e&&file.size<=120*1048576){try{e=await energyFast()}catch(x){e=null}}
+    chk();
+    if(!e)e=await energyScan();
+    chk();
+    const so=Float32Array.from(e).sort();
+    if(so[Math.floor(so.length*.9)]<.0006)throw new Error('Aucune parole détectée : la vidéo n’a pas de piste audio exploitable.');
+    step(1);say('Sélection des meilleurs passages…');prog(null);await sleep(30);
+    const [l,h]=$('#len').value.split('-').map(Number),lo=Math.min(l,dur*.6),hi=Math.min(h,dur),N=clampN();
+    const mode=$('#mode').value;let sel=null,txNote='';
+    if($('#tx').checked&&!cues.length){
+      try{sel=await understand(e,N,lo,hi,mode);if(!sel)txNote=' Aucune parole n’a pu être transcrite : le choix se base sur le son.'}
+      catch(err){if(err.message==='Annulé')throw err;asrKill();sel=null;txNote=' La transcription n’a pas pu être utilisée ('+(err.message||err)+') : le choix se base sur le son.'}
+    }
+    if(!sel)sel=pick(e,N,lo,hi,mode);
+    if(!sel.length)throw new Error('Aucun passage assez long et assez parlé n’a été trouvé dans cette vidéo.');
+    lastE=e;props=sel.map(x=>({s:x.s,e:x.e,on:true,score:x.score,why:x.why,text:x.text}));const short=sel.length<N?' La vidéo ne contient que '+sel.length+' passage'+(sel.length>1?'s distincts':' distinct')+' de cette durée : essayez des clips plus courts.':'';
+    drawWave(e,sel);prog(undefined);
+    if($('#rv').checked){
+      showRev();step(2);say(sel.length+' passage'+(sel.length>1?'s différents ont été trouvés':' a été trouvé')+'. Le score estime l’intérêt à partir du son'+(cues.length?' et du texte':'')+'.'+txNote+' Vérifiez-les, ajustez si besoin, puis cliquez sur « Monter les clips cochés ».'+short+(cues.length||$('#tx').checked?'':' Pour que le choix tienne aussi compte du contenu, activez la transcription ou ajoutez un fichier de sous-titres.'));
+      $('#rev').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }else{if(short||txNote)say((short+txNote).trim());await doMontage(props.map(p=>({s:p.s,e:p.e,ref:p})))}
+  });
+}
+function startMontage(){
+  thumbTok++;
+  const list=props.filter(p=>p.on)  .map(p=>({s:Math.max(0,p.s),e:Math.min(dur,p.e,p.s+180),ref:p})).filter(p=>p.e-p.s>=5).sort((a,b)=>a.s-b.s);
+  if(!list.length)return say('Cochez au moins un passage d’au moins 5 secondes.',true);
+  guarded(()=>doMontage(list));
+}
+async function doMontage(list){
+  const common=$('#ttl').value.trim(),series=$('#ser').checked,total=list.length,tot=list.reduce((a,x)=>a+x.e-x.s,0),t0=Date.now();
+  let done=0,ok=0,fails=0;
+  $('#out').hidden=false;
+  for(let i=0;i<total;i++){
+    chk();
+    const x=list[i];await ensureCues(x);
+    const c={s:x.s,e:x.e,badge:series&&total>1?'Partie '+(i+1)+'/'+total:'',cues:cuesFor(x)};
+    const text=c.cues.map(q=>q.text).join(' '),m=text.length>20?mkTitle(text):null;
+    c.title=common||(m?m.title:'');c.tags=m?m.tags.join(' '):'#fyp #pourtoi';
+    step(2);let last=0;
+    try{
+      const blob=await render(c,f=>{
+        const fr=(done+f*(c.e-c.s))/tot,el=(Date.now()-t0)/1000;prog(fr);
+        if(Date.now()-last>1000){last=Date.now();say('Montage du clip '+(i+1)+' sur '+total+(fr>.03?' · reste environ '+eta(el/fr-el):'')+'…')}
+      });
+      chk();addCard(c,blob,++seq);ok++;if(x.ref){x.ref.on=false;x.ref.done=true}
+    }catch(err){if(err.message==='Annulé')throw err;fails++}
+    done+=c.e-c.s;await sleep(50);
+  }
+  step(3);prog(undefined);
+  if(!ok)throw new Error('Aucun clip n’a pu être monté. Essayez la qualité 540 ou 720, un autre navigateur (Chrome/Edge recommandé), ou convertissez votre vidéo en MP4 H.264 optimisé pour le web.');
+  say(ok+' clip'+(ok>1?'s sont prêts':' est prêt')+'.'+(fails?' '+fails+' n’'+(fails>1?'ont':'a')+' pas pu être monté'+(fails>1?'s':'')+'.':'')+(c0()?'':' Ajoutez un titre à chaque clip puis cliquez sur « Incruster le titre ».'));
+  if(lastE)showRev();
+  $('#out').scrollIntoView({behavior:'smooth',block:'start'});
+}
+const c0=()=>clips.every(c=>c.title);
+
+/* ---------- Événements ---------- */
+const input=$('#file'),dz=$('#drop');
+loadSet();try{autoLite()}catch(e){}
+$('#pick').onclick=e=>{e.stopPropagation();input.click()};
+dz.onclick=()=>input.click();
+dz.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}};
+input.onchange=()=>{load(input.files[0]);input.value=''};
+$('#change').onclick=()=>input.click();
+['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{e.preventDefault();dz.classList.add('over')}));
+['dragleave','drop'].forEach(t=>document.addEventListener(t,e=>{e.preventDefault();dz.classList.remove('over')}));
+document.addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files[0];if(!f)return;if(/\.(srt|vtt)$/i.test(f.name)&&file)return loadSub(f);load(f)});
+$('#work').addEventListener('change',saveSet);
+$('#sub').onchange=()=>loadSub($('#sub').files[0]);
+$('#go').onclick=analyze;
+$('#stop').onclick=()=>{abort=true;say('Annulation en cours…')};
+$('#mont').onclick=startMontage;
+$('#more').onclick=()=>{
+  if(!lastE||busy)return;
+  const [l,h]=$('#len').value.split('-').map(Number),add=pick(lastE,clampN(),Math.min(l,dur*.6),Math.min(h,dur),'best',props.map(p=>({s:p.s,e:p.e})));
+  if(!add.length)return say('Il n’y a plus de passage distinct disponible dans cette vidéo.',true);
+  add.forEach(x=>props.push({s:x.s,e:x.e,on:true,score:x.score,why:x.why,text:x.text}));props.sort((a,b)=>a.s-b.s);showRev();
+  say(add.length+' nouveau'+(add.length>1?'x':'')+' passage'+(add.length>1?'s':'')+' proposé'+(add.length>1?'s':'')+'.');
+};
+$('#revlist').addEventListener('change',revChange);
+$('#revlist').addEventListener('click',revClick);
+$('#addp').onclick=()=>{
+  if(!file||busy)return;
+  const s=Math.min($('#pv').currentTime,Math.max(0,dur-10));
+  props.push({s,e:Math.min(dur,s+45),on:true});props.sort((a,b)=>a.s-b.s);showRev();
+};
+$('#pv').addEventListener('timeupdate',()=>{const v=$('#pv');if(stopAt&&v.currentTime>=stopAt){v.pause();stopAt=0}});
+$('#wave').onclick=ev=>{if(!dur)return;const r=ev.currentTarget.getBoundingClientRect();$('#pv').currentTime=(ev.clientX-r.left)/r.width*dur};
+$('#dlall').onclick=async()=>{
+  if(!clips.length)return;
+  if(clips.length===1&&!(clips[0].cues&&clips[0].cues.length))return save(clips[0].blob,clips[0].base()+'.'+clips[0].ext);
+  const b=$('#dlall');b.disabled=true;b.textContent='Création de l’archive…';
+  try{
+    const fs=[];
+    clips.forEach(c=>{fs.push({name:c.base()+'.'+c.ext,blob:c.blob});if(c.cues&&c.cues.length)fs.push({name:c.base()+'.srt',blob:new Blob([srtOf(c.cues)],{type:'text/plain'})})});
+    save(await zip(fs),'cadence-clips.zip');
+  }catch(e){say('Impossible de créer l’archive. Téléchargez les clips un par un.',true)}
+  b.disabled=false;b.textContent='Tout télécharger (.zip)';
+};
+</script>
+</body>
+</html>
